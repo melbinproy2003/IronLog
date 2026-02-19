@@ -23,8 +23,6 @@ IronLog lets you log workouts, follow training plans, and track progress (1RM, v
 **Tap the link below on your phone to download the app.** The APK will download automatically; then open the file and allow "Install from unknown sources" if asked.
 
 ---
-
-### [Download IronLog APK](https://github.com/melbinproy2003/IronLog/releases/latest/download/app-release.apk)
 ### [Download](https://github.com/melbinproy2003/IronLog/raw/refs/heads/main/releases/latest/download/app-release.apk)
 
 ---
