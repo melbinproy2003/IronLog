@@ -7,7 +7,6 @@ import '../models/exercise_set_model.dart';
 import '../models/workout_model.dart';
 import '../providers/plan_provider.dart';
 import '../providers/workout_provider.dart';
-import '../services/hive_service.dart';
 import '../widgets/date_picker_bar.dart';
 import '../widgets/exercise_card.dart';
 
@@ -54,9 +53,9 @@ class _FreeWorkoutScreenState extends ConsumerState<FreeWorkoutScreen> {
     }
 
     // Priority 2: Check last workout for this exercise
-    final hiveService = ref.read(hiveServiceProvider);
-    await hiveService.open();
-    final lastWorkout = hiveService.getMostRecentWorkoutForExercise(exerciseName);
+    final hive = ref.read(hiveServiceProvider);
+    await hive.open();
+    final lastWorkout = ref.read(workoutRepositoryProvider).getMostRecentWorkoutForExercise(exerciseName);
 
     if (lastWorkout != null) {
       final validSets = lastWorkout.sets.where((s) => s.weight > 0).toList();

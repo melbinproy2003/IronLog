@@ -3,10 +3,13 @@ import 'package:uuid/uuid.dart';
 
 import '../models/exercise_set_model.dart';
 import '../models/workout_model.dart';
+import '../repositories/workout_repository.dart';
 import '../services/coach_engine.dart';
 import '../services/hive_service.dart';
 import '../services/progression_engine.dart';
 import '../services/stats_service.dart';
+import 'auth_provider.dart';
+import 'firestore_provider.dart';
 import 'plan_provider.dart';
 
 /// Provides [HiveService]. Override in main with an opened instance after Hive.initFlutter().
@@ -16,11 +19,21 @@ final hiveServiceProvider = Provider<HiveService>((ref) {
   );
 });
 
-/// All workouts from storage. Refreshed when [saveWorkout] or [deleteWorkout] is used.
+/// Workout repository: Hive first, Firestore sync when authenticated.
+final workoutRepositoryProvider = Provider<WorkoutRepository>((ref) {
+  return WorkoutRepository(
+    hiveService: ref.watch(hiveServiceProvider),
+    firestoreService: ref.watch(firestoreServiceProvider),
+    authService: ref.watch(authServiceProvider),
+    pendingSync: ref.watch(pendingSyncServiceProvider),
+  );
+});
+
+/// All workouts from storage (via repository). Refreshed when [saveWorkout] or [deleteWorkout] is used.
 final allWorkoutsProvider = FutureProvider<List<Workout>>((ref) async {
   final hive = ref.watch(hiveServiceProvider);
   await hive.open();
-  return hive.getAllWorkouts();
+  return ref.watch(workoutRepositoryProvider).getAllWorkouts();
 });
 
 /// Workouts for today (calendar day).
@@ -40,7 +53,7 @@ final todayWorkoutsProvider = FutureProvider<List<Workout>>((ref) async {
 final allExerciseNamesProvider = FutureProvider<List<String>>((ref) async {
   final hive = ref.watch(hiveServiceProvider);
   await hive.open();
-  return hive.getAllExerciseNames();
+  return ref.watch(workoutRepositoryProvider).getAllExerciseNames();
 });
 
 /// Workouts in the last N days (for progression/coach). Default 56 (8 weeks).
@@ -178,31 +191,27 @@ class WorkoutNotifier extends AsyncNotifier<void> {
   Future<void> build() async {}
 
   Future<void> saveWorkout(Workout workout) async {
+    final repo = ref.read(workoutRepositoryProvider);
     final hive = ref.read(hiveServiceProvider);
     await hive.open();
-    
-    // If this is a planned workout and progression hasn't been applied, update the plan.
+
     bool shouldApplyProgression = false;
     if (workout.planId != null && workout.planDayId != null && !workout.progressionApplied) {
       shouldApplyProgression = true;
     }
-    
-    // Save workout first (with progressionApplied flag set if needed)
+
     Workout workoutToSave = workout;
     if (shouldApplyProgression) {
       workoutToSave = workout.copyWith(progressionApplied: true);
     }
-    await hive.saveWorkout(workoutToSave);
-    
-    // Apply progression logic only if not already applied
+    await repo.saveWorkout(workoutToSave);
+
     if (shouldApplyProgression) {
-      final planService = ref.read(planServiceProvider);
-      await planService.open();
-      final plan = planService.getPlanById(workout.planId!);
+      final planRepo = ref.read(planRepositoryProvider);
+      final plan = planRepo.getPlanById(workout.planId!);
       if (plan != null) {
-        final planDay = planService.getPlanDay(workout.planId!, workout.planDayId!);
+        final planDay = planRepo.getPlanDay(workout.planId!, workout.planDayId!);
         if (planDay != null) {
-          // Find matching exercise by name
           String? exerciseId;
           for (final ex in planDay.exercises) {
             if (ex.exerciseName == workout.exerciseName) {
@@ -210,22 +219,20 @@ class WorkoutNotifier extends AsyncNotifier<void> {
               break;
             }
           }
-          
           if (exerciseId != null) {
             final loggedReps = workout.sets.map((s) => s.reps).toList();
-            await planService.updateAndSavePlanAfterSession(
+            await planRepo.updateAndSavePlanAfterSession(
               plan: plan,
               dayId: workout.planDayId!,
               loggedRepsByExerciseId: {exerciseId: loggedReps},
             );
-            // Invalidate plan providers to refresh UI.
             ref.invalidate(allPlansProvider);
             ref.invalidate(activePlanProvider);
           }
         }
       }
     }
-    
+
     ref.invalidate(allWorkoutsProvider);
     ref.invalidate(todayWorkoutsProvider);
     ref.invalidate(allExerciseNamesProvider);
@@ -234,9 +241,10 @@ class WorkoutNotifier extends AsyncNotifier<void> {
   }
 
   Future<void> deleteWorkout(String id) async {
+    final repo = ref.read(workoutRepositoryProvider);
     final hive = ref.read(hiveServiceProvider);
     await hive.open();
-    await hive.deleteWorkout(id);
+    await repo.deleteWorkout(id);
     ref.invalidate(allWorkoutsProvider);
     ref.invalidate(todayWorkoutsProvider);
     ref.invalidate(allExerciseNamesProvider);

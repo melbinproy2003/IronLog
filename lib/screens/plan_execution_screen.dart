@@ -9,7 +9,6 @@ import '../models/plan_exercise_model.dart';
 import '../models/workout_model.dart';
 import '../providers/plan_provider.dart';
 import '../providers/workout_provider.dart';
-import '../services/hive_service.dart';
 import '../widgets/date_picker_bar.dart';
 import '../widgets/exercise_card.dart';
 import 'plan_day_selector.dart';
@@ -74,19 +73,21 @@ class _PlanExecutionScreenState extends ConsumerState<PlanExecutionScreen> {
       return;
     }
 
-    final hiveService = ref.read(hiveServiceProvider);
-    await hiveService.open();
+    final hive = ref.read(hiveServiceProvider);
+    await hive.open();
+    final workoutRepo = ref.read(workoutRepositoryProvider);
+    final planRepo = ref.read(planRepositoryProvider);
     final planService = ref.read(planServiceProvider);
     await planService.open();
 
     // Check for existing workouts on this date
-    final existingWorkouts = hiveService.getWorkoutsForPlanDay(
+    final existingWorkouts = workoutRepo.getWorkoutsForPlanDay(
       planId: widget.planId,
       planDayId: _selectedDayId!,
       date: date,
     );
 
-    final planDay = planService.getPlanDay(widget.planId, _selectedDayId!);
+    final planDay = planRepo.getPlanDay(widget.planId, _selectedDayId!);
     if (planDay == null) {
       setState(() => _isLoadingWorkouts = false);
       return;
@@ -147,7 +148,7 @@ class _PlanExecutionScreenState extends ConsumerState<PlanExecutionScreen> {
       });
     } else {
       // No workouts for this date - check for most recent workout
-      final mostRecent = hiveService.getMostRecentWorkoutForPlanDay(
+      final mostRecent = workoutRepo.getMostRecentWorkoutForPlanDay(
         planId: widget.planId,
         planDayId: _selectedDayId!,
       );

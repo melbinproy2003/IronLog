@@ -1,76 +1,46 @@
-# IronLog
+# 🏋️ IronLog
 
-**Offline workout tracking app with rule-based strength progression.** No backend, no account, no cost.
+<!-- ![Image](https://images.openai.com/static-rsc-3/uUGQg7gkDj9qt6CeaxxgHsfG3K1DC35o_qjq2cY7piQEo5UZYl3enzrtj8lFh1NoFA2ZlzcN8qDM1o3nAJ0Mb4eXbpOtaRiqvSfaPwatJlM?purpose=fullsize\&v=1)
 
----
+![Image](https://liftlog.plus/assets/frame-hero-81bcd263.png)
 
-## Summary
+![Image](https://www.fitnotesapp.com/images/Training_Track_Graph_Point_Selected.png)
 
-IronLog lets you log workouts, follow training plans, and track progress (1RM, volume, workout analyzer) entirely on your device. It uses simple rules to suggest when to add weight or deload—no cloud or paid APIs.
+![Image](https://www.fitnotesapp.com/images/Training_History.png) -->
 
-- **Dashboard** – Today's workouts, fatigue warning, next workout suggestion, filter by date/exercise/plan day
-- **Workout** – Start a plan day or log a free workout; plan workouts drive double-progression (weight/rep targets)
-- **Plans** – Create and edit multi-day plans with exercises, sets, min/max reps, and weight increments
-- **Progress** – 1RM chart, weekly volume (line chart), and workout analyzer (volume per session + session list)
-- **Offline-first** – Data stored locally with Hive; works without internet
-
-**Tech:** Flutter, Riverpod, Hive, fl_chart. Clean separation: UI → providers → services → models.
+**IronLog** is an offline-first workout tracking app built with Flutter.
+Track your workouts, follow structured plans, and progress your strength with smart weight suggestions.
 
 ---
 
-## Download (Release APK)
+## 🚀 Summary
 
-**Tap the link below on your phone to download the app.** The APK will download automatically; then open the file and allow "Install from unknown sources" if asked.
-
----
-### [Download](https://github.com/melbinproy2003/IronLog/raw/refs/heads/main/releases/latest/download/app-release.apk)
-
----
-
-**Setup (repo owner):** Replace `YOUR_USERNAME` with your GitHub username and `YOUR_REPO` with this repository name (e.g. `PrimeLift-AI` or `ironlog`). After you [create a release](#build-release-apk-yourself) and attach a file named **`app-release.apk`**, this link will always point to the latest release—one tap to download on phone or desktop.
+* 🏋️ Log exercises, sets, weight & reps
+* 📋 Create structured training plans
+* 📈 Track strength progress with charts
+* 🧠 Smart automatic weight progression
+* 📵 Works fully offline
+* ☁️ Optional cloud sync (Firebase)
 
 ---
 
-## Build release APK yourself
+## 📦 Download APK (Only For Android)
 
-**Requirements:** Flutter SDK ([flutter.dev](https://flutter.dev)).
+🔗 **[Download Latest Release](https://github.com/melbinproy2003/IronLog/raw/refs/heads/main/releases/latest/download/app-release.apk)**
 
-```bash
-# Clone (if needed)
-git clone <your-repo-url>
-cd "PrimeLift AI"   # or your project folder name
-
-# Get dependencies
-flutter pub get
-
-# Build release APK
-flutter build apk --release
-```
-
-The APK is generated at:
-
-**`build/app/outputs/flutter-apk/app-release.apk`**
-
-- Install on a device: copy `app-release.apk` to the phone and open it, or use `flutter install --release` with the device connected.
-- **Provide the APK to users (e.g. GitHub):**
-  1. Go to your repo on GitHub → **Releases** → **Create a new release**.
-  2. Choose or create a tag (e.g. `v1.0.0`), add a title and optional description.
-  3. Attach **`app-release.apk`** (drag & drop or "Attach binaries"). **Name the file exactly `app-release.apk`** so the download link above works.
-  4. Publish the release. The [Download IronLog APK](#download-release-apk) link will then start the APK download when users tap it on their phone.
+> Open on Android device → Enable *Install from unknown sources* if prompted.
 
 ---
 
-## Run from source
+## 🛠 Built With
 
-```bash
-flutter pub get
-flutter run
-```
-
-See **Setups.md** in this repo for detailed setup and run instructions.
+* Flutter
+* Riverpod
+* Hive
+* Firebase
 
 ---
 
-## License
+**Made with Flutter ❤️**
 
-See the repository license file (if present).
+---

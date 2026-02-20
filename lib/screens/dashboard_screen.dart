@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../models/workout_model.dart';
+import '../providers/auth_provider.dart';
 import '../providers/dashboard_provider.dart';
 import '../providers/plan_provider.dart';
 import '../providers/workout_provider.dart';
@@ -37,6 +38,13 @@ class DashboardScreen extends ConsumerWidget {
                   : null,
             ),
             onPressed: () => showDashboardFilterSheet(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Sign out',
+            onPressed: () async {
+              await ref.read(authServiceProvider).signOut();
+            },
           ),
         ],
       ),
